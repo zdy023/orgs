@@ -1,0 +1,6 @@
+django==1.9.1
+requests
+mysqlclient
+pyexcel
+pyexcel-io
+pyexcel-xls

@@ -1,0 +1,92 @@
+{% include "header.html" %}
+{% verbatim  %}
+
+<el-row style="min-height: 240px;" v-if="!employees_failed">
+  <el-col :span=6 v-if="auth.cur_type <= 3">
+    <h4>批量导入数据</h4>
+    <div>请选择您当前的身份（权限）</div>
+    <div>
+      <el-select v-model="auth.cur_job" @change="set_job"
+          placeholder="您没有导入数据的权限">
+        <el-option
+          v-for="job in auth.jobs"
+          :label="job.branch + ':' + job.title + ' (级别 ' + job.type + ')'"
+          :value="job.id">
+        </el-option>
+      </el-select>
+    </div>
+    <div>
+      <el-upload
+        :action="upload.baseUrl + upload.type"
+        :on-success="doParse"
+        :default-file-list="upload.fileList">
+        <el-button size="small" type="primary">点击上传(批量更新)</el-button>
+        <div class="el-upload__tip" slot="tip">请上传格式正确的xls/xlsx文件</div>
+      </el-upload>
+    </div>
+  </el-col>
+  <el-col :span=6 v-if="user.super">
+    <h4>设置管理员</h4>
+    <div>
+      <el-select v-model="admins.to_mod" placeholder="学号"
+          clearable filterable allow-create>
+        <el-option
+          v-for="item in admins.list"
+          :label="item.name + ' (' + item.card + ')'"
+          :value="item.card">
+        </el-option>
+      </el-select>
+    </div>
+    <div>
+      <el-button type="success" icon="check" @click="set_admin(1)">设为一级管理员</el-button>
+      <el-button type="danger" icon="delete" @click="set_admin(0)">删除一级权限</el-button>
+    </div>
+  </el-col>
+  <el-col :span=6 v-if="auth.ori_type === 2">
+    <h4>设置助手</h4>
+    <div>
+      <el-select v-model="employee.helper_job" placeholder="请选择 三级负责人"
+          clearable filterable>
+        <el-option
+          v-for="item in employee.list" v-if="item.type === 3"
+          :label="item.branch + ':' + item.title + ' ' + item.name"
+          :value="item.id">
+        </el-option>
+      </el-select>
+    </div>
+    <div>
+      <el-button type="success" icon="check" @click="set_helper(1)">设置</el-button>
+      <el-button type="danger" icon="delete" @click="set_helper(0)">删除助手</el-button>
+    </div>
+  </el-col>
+</el-row>
+
+<el-row>
+  <el-col :span=2><div style="visibility: hidden;">&nbsp;</div></el-col>
+  <el-col :span=20>
+    <el-row>
+      <el-col :span=16>直接管理的人员</el-col>
+      <el-col :span=8 v-if="!employees_failed"><a href="/">查看更多</a></el-col>
+    </el-row>
+    <el-table
+      :data="employee.list"
+      border stripe :empty-text="employees_failed || '加载中'"
+      style="width: 96%">
+      <el-table-column prop="type" sortable label="级别" width=100></el-table-column>
+      <el-table-column prop="branch" sortable label="部门名"></el-table-column>
+      <el-table-column prop="title" label="职务名"></el-table-column>
+      <el-table-column prop="card" sortable label="学号"></el-table-column>
+      <el-table-column prop="name" sortable label="姓名"></el-table-column>
+      <el-table-column prop="start" sortable label="任命时间">
+        <template scope="scope">
+          <el-icon name="time"></el-icon>
+          <span style="margin-left: 10px">{{ scope.row.start | date }}</span>
+        </template>
+      </el-table-column>
+    </el-table>
+  </el-col>
+</el-row>
+
+<script src="/static/js/admin.js"></script>
+{% endverbatim  %}
+{% include "footer.html" %}
